@@ -2,6 +2,7 @@
 /config/
 /dist/
 /lib/
+/demo/
 /coverage/
 /*.js
 node_modules

@@ -28,6 +28,10 @@ export default {
       default: () => {
         return false
       }
+    },
+    enabledDate: {
+      type: Function,
+      default: null
     }
   },
   methods: {
@@ -36,6 +40,10 @@ export default {
       if (this.disabledDate(date)) {
         return
       }
+      if (this.enabledDate && !this.enabledDate(date)) {
+        return
+      }
+
       this.$emit('select', date)
     },
     getDays (firstDayOfWeek) {
@@ -48,7 +56,7 @@ export default {
       const time = new Date(year, month)
 
       time.setDate(0) // 把时间切换到上个月最后一天
-      const lastMonthLength = (time.getDay() + 7 - firstDayOfWeek) % 7 + 1 // time.getDay() 0是星期天, 1是星期一 ...
+      const lastMonthLength = ((time.getDay() + 7 - firstDayOfWeek) % 7) + 1 // time.getDay() 0是星期天, 1是星期一 ...
       const lastMonthfirst = time.getDate() - (lastMonthLength - 1)
       for (let i = 0; i < lastMonthLength; i++) {
         arr.push({ year, month: month - 1, day: lastMonthfirst + i })
@@ -73,7 +81,8 @@ export default {
       const cellTime = new Date(year, month, day).getTime()
       const today = new Date().setHours(0, 0, 0, 0)
       const curTime = this.value && new Date(this.value).setHours(0, 0, 0, 0)
-      const startTime = this.startAt && new Date(this.startAt).setHours(0, 0, 0, 0)
+      const startTime =
+        this.startAt && new Date(this.startAt).setHours(0, 0, 0, 0)
       const endTime = this.endAt && new Date(this.endAt).setHours(0, 0, 0, 0)
 
       if (month < this.calendarMonth) {
@@ -92,6 +101,9 @@ export default {
         classes.push('disabled')
       }
 
+      if (this.enabledDate && !this.enabledDate(cellTime)) {
+        classes.push('disabled')
+      }
       if (curTime) {
         if (cellTime === curTime) {
           classes.push('actived')
@@ -112,7 +124,11 @@ export default {
       return <th>{day}</th>
     })
 
-    const dates = this.getDates(this.calendarYear, this.calendarMonth, this.firstDayOfWeek)
+    const dates = this.getDates(
+      this.calendarYear,
+      this.calendarMonth,
+      this.firstDayOfWeek
+    )
     const tbody = Array.apply(null, { length: 6 }).map((week, i) => {
       const tds = dates.slice(7 * i, 7 * i + 7).map(date => {
         const attrs = {
@@ -125,7 +141,8 @@ export default {
             data-year={date.year}
             data-month={date.month}
             title={this.getCellTitle(date)}
-            onClick={this.selectDate.bind(this, date)}>
+            onClick={this.selectDate.bind(this, date)}
+          >
             {date.day}
           </td>
         )
@@ -138,9 +155,7 @@ export default {
         <thead>
           <tr>{ths}</tr>
         </thead>
-        <tbody>
-          {tbody}
-        </tbody>
+        <tbody>{tbody}</tbody>
       </table>
     )
   }

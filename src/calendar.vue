@@ -29,6 +29,7 @@
         :end-at="endAt"
         :first-day-of-week="firstDayOfWeek"
         :disabled-date="isDisabledDate"
+        :enabled-date="enabledDate"
         @select="selectDate"
       />
       <panel-year
@@ -124,6 +125,10 @@ export default {
       default: function () {
         return []
       }
+    },
+    enabledDate: {
+      type: Function,
+      default:null
     },
     minuteStep: {
       type: Number,
